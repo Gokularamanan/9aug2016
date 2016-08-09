@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "187003185360",
+    "firebase_url": "https://angular-vector-139809.firebaseio.com",
+    "project_id": "angular-vector-139809",
+    "storage_bucket": "angular-vector-139809.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:187003185360:android:3119090fc4960417",
+        "android_client_info": {
+          "package_name": "com.example.rbp687.a9aug2016"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "187003185360-l6ubf5jlgfp3kdbbl8960bslaq59o6k9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDdkPrQdlQlRdTSXv4jhkpIwgKFh_DeGKo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
