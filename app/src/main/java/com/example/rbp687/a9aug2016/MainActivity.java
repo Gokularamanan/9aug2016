@@ -2,6 +2,7 @@ package com.example.rbp687.a9aug2016;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -38,6 +39,9 @@ public class MainActivity extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
+
+    SharedPreferences sharedPreferences;
+    public static final String MyPREFERENCES = "MyPrefs" ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,13 +168,38 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
+            sharedPreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
             switch (position) {
                 case 0:
-                    return "SECTION 1";
+                    switch (sharedPreferences.getInt("a",0)){
+                        case 0:
+                            return "00";
+                        case 1:
+                            return "01";
+                        case 2:
+                            return "02";
+
+                    }
                 case 1:
-                    return "SECTION 2";
+                    switch (sharedPreferences.getInt("a",0)){
+                        case 0:
+                            return "10";
+                        case 1:
+                            return "11";
+                        case 2:
+                            return "12";
+
+                    }
                 case 2:
-                    return "SECTION 3";
+                    switch (sharedPreferences.getInt("a",0)){
+                        case 0:
+                            return "20";
+                        case 1:
+                            return "21";
+                        case 2:
+                            return "22";
+
+                    }
             }
             return null;
         }
