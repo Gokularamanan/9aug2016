@@ -21,7 +21,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        ///setContentView(R.layout.activity_main);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
+        ///mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
@@ -137,9 +141,45 @@ public class MainActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-            TextView textView = (TextView) rootView.findViewById(R.id.section_label);
-            textView.setText(getString(R.string.section_format, getArguments().getInt(ARG_SECTION_NUMBER)));
-            return rootView;
+
+            switch (getArguments().getInt(ARG_SECTION_NUMBER)){
+                case 1:
+                    ListView list;
+                    String[] web = {
+                            "Google Plus",
+                            "Twitter",
+                            "Windows",
+                            "Bing",
+                            "Itunes",
+                            "Wordpress",
+                            "Drupal"
+                    } ;
+                    String[] imageId = {
+                            Constants.internetUrl,
+                            Constants.internetUrlChick,
+                            Constants.internetUrlMutton,
+                            Constants.internetUrlFish,
+                            Constants.internetUrlChick,
+                            Constants.internetUrlMutton,
+                            Constants.internetUrlFish
+                    };
+                    CustomList adapter = new
+                            CustomList(getActivity(), web, imageId);
+                    list=(ListView)rootView.findViewById(R.id.list);
+                    list.setAdapter(adapter);
+/*                    internetUrl = Constants.internetUrlChick;
+                    Glide.with(this).load(internetUrl).into(targetImageView);*/
+                    return rootView;
+                case 2:
+/*                    internetUrl = Constants.internetUrlMutton;
+                    Glide.with(this).load(internetUrl).into(targetImageView);*/
+                    return rootView;
+                case 3:
+/*                    internetUrl = Constants.internetUrlFish;
+                    Glide.with(this).load(internetUrl).into(targetImageView);*/
+                    return rootView;
+            }
+            return null;
         }
     }
 

@@ -2,6 +2,7 @@ package com.example.rbp687.a9aug2016;
 
 import android.content.Context;
 import android.os.AsyncTask;
+import android.util.Log;
 import android.util.Pair;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import java.io.IOException;
  * Created by rbp687 on 8/9/2016.
  */
 public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, String> {
+    private static final String TAG = "EndpointsAsyncTask";
     private static MyApi myApiService = null;
     private Context context;
 
@@ -41,6 +43,7 @@ public class EndpointsAsyncTask extends AsyncTask<Pair<Context, String>, Void, S
 
     @Override
     protected void onPostExecute(String result) {
+        Log.d(TAG, result);
         Toast.makeText(context, result, Toast.LENGTH_LONG).show();
     }
 }
