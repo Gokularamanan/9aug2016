@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.rbp687.a9aug2016.Constants;
 import com.example.rbp687.a9aug2016.mData.Movie;
 import com.example.rbp687.a9aug2016.mRecycler.MyAdapter;
 import com.firebase.client.ChildEventListener;
@@ -42,12 +43,13 @@ public class FireBaseClient {
     }
 
     //Save
-    public void saveOnline(String name, String url) {
+    public void saveOnline(String name, String url, int status) {
         Movie m = new Movie();
         m.setName(name);
         m.setUrl(url);
+        m.setStatus(status);
 
-        fire.child("todoItems").push().setValue(m);
+        fire.child("AllIncoming").push().setValue(m);
     }
 
     //Retrive
@@ -89,14 +91,16 @@ public class FireBaseClient {
         Log.d(TAG, "getUpdates");
         movies.clear();
         for(DataSnapshot ds :dataSnapshot.getChildren()) {
-            Movie m=new Movie();
-            String name= ds.getValue(Movie.class).getName();
-            String url= ds.getValue(Movie.class).getUrl();
-            Log.i(TAG, name + " " + url);
-            m.setName(name);
-            m.setUrl(url);
-
-            movies.add(m);
+            int status = ds.getValue(Movie.class).getStatus();
+            if (status == Constants.publishApproved) {
+                String name= ds.getValue(Movie.class).getName();
+                String url= ds.getValue(Movie.class).getUrl();
+                Log.i(TAG, name + " " + url + " " + Integer.toString(status));
+                Movie m=new Movie();
+                m.setName(name);
+                m.setUrl(url);
+                movies.add(m);
+            }
         }
         if(movies.size()>0) {
             adapter=new MyAdapter(c,movies);

@@ -7,6 +7,7 @@ package com.example.rbp687.a9aug2016.mData;
 public class Movie {
     private String name;
     private String url;
+    private int status;
 
     public String getName() {
         return name;
@@ -22,6 +23,14 @@ public class Movie {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public Movie() {

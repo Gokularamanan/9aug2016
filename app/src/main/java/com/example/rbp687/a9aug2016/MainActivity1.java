@@ -4,11 +4,13 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Log;
 import android.util.Pair;
 import android.view.Menu;
@@ -22,9 +24,10 @@ import com.firebase.client.Firebase;
 
 public class MainActivity1 extends AppCompatActivity {
 
-    final static String DB_URL = "https://angular-vector-139809.firebaseio.com/todoItems";
     private static final String TAG = "MainActivity1";
-    EditText nameEditText,urlEditText;
+    EditText nameEditText;
+    EditText urlEditText;
+    EditText statusEditText;
     Button saveBtn;
     RecyclerView rv;
 
@@ -45,7 +48,7 @@ public class MainActivity1 extends AppCompatActivity {
 
         Log.d(TAG, "Layout and view are ready");
 
-        fireBaseClient = new FireBaseClient(this,DB_URL,rv);
+        fireBaseClient = new FireBaseClient(this,Constants.fireBaseBaseUrl,rv);
         fireBaseClient.refreshData();
 
         fab.setOnClickListener(new View.OnClickListener() {
@@ -91,22 +94,36 @@ public class MainActivity1 extends AppCompatActivity {
 
     //Show input dialog
     private void displayDialog(){
-        Dialog d = new Dialog(this);
+        final Dialog d = new Dialog(this);
         d.setTitle("Save Online");
         d.setContentView(R.layout.dialoglayout);
 
         nameEditText=(EditText)d.findViewById(R.id.nameEditText);
         urlEditText=(EditText)d.findViewById(R.id.uriEditText);
-
+        if(BuildConfig.DEBUG) {
+            TextInputLayout textInputLayout = (TextInputLayout)d.findViewById(R.id.statusLayout);
+            textInputLayout.setVisibility(View.VISIBLE);
+            statusEditText = (EditText)d.findViewById(R.id.statusEditText);
+            statusEditText.setText(Integer.toString(Constants.publishReviewPending));
+        }
         saveBtn = (Button)d.findViewById(R.id.saveBtn);
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fireBaseClient.saveOnline(nameEditText.getText().toString(), urlEditText.getText().toString());
+                //TODO: Gokul- Need to do in better way without using try, catch
+                int status = Constants.publishReviewPending;
+                try{
+                    status = Integer.parseInt(statusEditText.getText().toString());
+                }catch (Exception e) {
+                    Log.d(TAG, e.toString());
+                }
+                fireBaseClient.saveOnline(nameEditText.getText().toString(),
+                        urlEditText.getText().toString(), status);
 
                 nameEditText.setText("");
                 urlEditText.setText("");
+                d.dismiss();
             }
         });
 
