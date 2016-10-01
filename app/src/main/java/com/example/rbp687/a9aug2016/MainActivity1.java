@@ -41,7 +41,7 @@ public class MainActivity1 extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-        Log.d(TAG, "onCreate");
+        Log.d(TAG, "onCreate-MainActivity1");
 
         rv=(RecyclerView)findViewById(R.id.mRecycleID);
         rv.setLayoutManager(new LinearLayoutManager(this));
@@ -85,6 +85,11 @@ public class MainActivity1 extends AppCompatActivity {
         }
         if (id == R.id.action_settings2) {
             Intent intent = new Intent(this, FirebasePic.class);
+            startActivity(intent);
+            return true;
+        }
+        if (id == R.id.action_settings3) {
+            Intent intent = new Intent(this, Userinput.class);
             startActivity(intent);
             return true;
         }

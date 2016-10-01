@@ -3,6 +3,8 @@
     <string name="action_settings">Settings</string>
     <string name="action_settings1">Firebase text </string>
     <string name="action_settings2">Firebase pic</string>
+    <string name="action_settings3">Upload input</string>
+    <string name="action_settings4">Save in fire</string>
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="title_activity_scrolling">FirebaseActivity</string>
     <string name="large_text">
