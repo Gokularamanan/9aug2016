@@ -10,23 +10,35 @@ import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.rbp687.a9aug2016.mFireBase.FireBaseClient;
+import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
+import com.google.android.gms.common.GooglePlayServicesRepairableException;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlacePicker;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 
 import com.google.firebase.*;
+import com.google.firebase.database.snapshot.LongNode;
 import com.google.firebase.internal.NonNull;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -47,11 +59,19 @@ public class Userinput extends AppCompatActivity {
 
     private static final int REQUEST_IMAGE_CAMERA = 101;
     private static final int REQUEST_IMAGE_GALLERY = 102;
+    private static final int PLACE_PICKER_REQUEST = 103;
     private final String TAG = this.getClass().getName();
 
     ImageView imageButton;
+    EditText statusEditText;
+    EditText editTextTitle;
+    EditText editTextDesc;
     String picturePath;
     Bitmap bitmap;
+    Uri downloadUrl;
+    FireBaseClient fireBaseClient;
+    EditText editTextMap;
+    Button editTextMapAddress;
 
 
     @Override
@@ -59,11 +79,23 @@ public class Userinput extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_userinput);
 
+        if(BuildConfig.DEBUG) {
+            TextInputLayout textInputLayout = (TextInputLayout)findViewById(R.id.statusLayoutt);
+            textInputLayout.setVisibility(View.VISIBLE);
+            statusEditText = (EditText)findViewById(R.id.statusEditText);
+            statusEditText.setText(Integer.toString(Constants.publishReviewPending));
+        }
+
         Log.d(TAG, "onCreate");
 
-        EditText editTextTitle = (EditText) findViewById(R.id.editTextTitle);
+        fireBaseClient = new FireBaseClient(this,Constants.fireBaseBaseUrl);
+
+        editTextTitle = (EditText) findViewById(R.id.editTextTitle);
         imageButton = (ImageView) findViewById(R.id.imageButton);
-        EditText editTextDesc = (EditText) findViewById(R.id.editTextDesc);
+        editTextDesc = (EditText) findViewById(R.id.editTextDesc);
+        editTextMap = (EditText) findViewById(R.id.editTextMap);
+        editTextMapAddress = (Button) findViewById(R.id.editTextMapAddress);
+
 
         imageButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +104,20 @@ public class Userinput extends AppCompatActivity {
             }
         });
 
+        editTextMapAddress.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "onClick-Map button");
+                PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
+                try {
+                    startActivityForResult(builder.build(Userinput.this), PLACE_PICKER_REQUEST);
+                } catch (GooglePlayServicesRepairableException e) {
+                    e.printStackTrace();
+                } catch (GooglePlayServicesNotAvailableException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override
@@ -90,32 +136,45 @@ public class Userinput extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            saveInFireBase();
-            return true;
+            if (!TextUtils.isEmpty(editTextTitle.getText().toString()) &&
+                    downloadUrl != null &&
+                    !TextUtils.isEmpty(editTextTitle.getText().toString())) {
+                int status = Constants.publishReviewPending;
+                try {
+                    status = Integer.parseInt(statusEditText.getText().toString());
+                } catch (Exception e) {
+                    Log.d(TAG, e.toString());
+                }
+                fireBaseClient.saveOnline(editTextTitle.getText().toString(),
+                        downloadUrl.toString(),
+                        editTextDesc.getText().toString(), status);
+                return true;
+            }else {
+                Log.e(TAG, "Field not populated");
+            }
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     private void saveInFireBase() {
         Log.d(TAG, "saveInFireBase");
         // Create a storage reference from our app
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child("folderName/file.jpg");
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference().child(Constants.userId);
         Log.d(TAG, "toString:"  + storageRef.toString());
         Log.d(TAG, "getBucket:"  + storageRef.getBucket());
-        Log.d(TAG, "getBucket:"  + storageRef.getBucket());
+        Log.d(TAG, "getName:"  + storageRef.getName());
         Log.d(TAG, "getPath:"  + storageRef.getPath());
 
 
         // Create a reference to "chicken.jpg"
-        StorageReference mountainsRef = storageRef.child("chicken.jpg");
+        StorageReference mountainsRef = storageRef.child("images/"+ String.valueOf(System.currentTimeMillis()));
 
-        // Create a reference to 'images/chicken.jpg'
+/*        // Create a reference to 'images/chicken.jpg'
         StorageReference mountainImagesRef = storageRef.child("images/chicken.jpg");
 
         // While the file names are the same, the references point to different files
         mountainsRef.getName().equals(mountainImagesRef.getName());    // true
-        mountainsRef.getPath().equals(mountainImagesRef.getPath());    // false
+        mountainsRef.getPath().equals(mountainImagesRef.getPath());    // false*/
 
         // Get the data from an ImageView as bytes
         imageButton.setDrawingCacheEnabled(true);
@@ -137,7 +196,7 @@ public class Userinput extends AppCompatActivity {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 Log.d(TAG, "uploadTask-onSuccess");
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
-                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                downloadUrl = taskSnapshot.getDownloadUrl();
                 Log.d(TAG, downloadUrl.toString());
             }
         });
@@ -173,6 +232,7 @@ public class Userinput extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
+            Log.d(TAG, "onActivityResult-requestCode:" + String.valueOf(requestCode));
             if (requestCode == REQUEST_IMAGE_CAMERA) {
                 File f = new File(Environment.getExternalStorageDirectory().toString());
                 for (File temp : f.listFiles()) {
@@ -198,6 +258,7 @@ public class Userinput extends AppCompatActivity {
                     File file = new File(path, String.valueOf(System.currentTimeMillis()) + ".jpg");
                     Log.d(TAG, "picturePath Camera: " + file.getAbsolutePath());
                     picturePath = file.getAbsolutePath();
+                    saveInFireBase();
                     try {
                         outFile = new FileOutputStream(file);
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 85, outFile);
@@ -225,6 +286,14 @@ public class Userinput extends AppCompatActivity {
                 Bitmap thumbnail = (BitmapFactory.decodeFile(picturePath));
                 Log.w(TAG, "picturePath Gallery: " + picturePath);
                 imageButton.setImageBitmap(thumbnail);
+                saveInFireBase();
+            } else if (requestCode == PLACE_PICKER_REQUEST) {
+                Place place = PlacePicker.getPlace(data, this);
+                String toastMsg = String.format("Place: %s", place.getName());
+                Log.d(TAG, toastMsg);
+                final LatLng location = place.getLatLng();
+                Log.d(TAG, "latitude:" + String.valueOf(location.latitude) + "longitude:" + String.valueOf(location.longitude));
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show();
             }
         }
     }

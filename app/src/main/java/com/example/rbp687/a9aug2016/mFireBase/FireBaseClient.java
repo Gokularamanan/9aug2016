@@ -6,6 +6,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.rbp687.a9aug2016.Constants;
+import com.example.rbp687.a9aug2016.Userinput;
 import com.example.rbp687.a9aug2016.mData.Movie;
 import com.example.rbp687.a9aug2016.mRecycler.MyAdapter;
 import com.firebase.client.ChildEventListener;
@@ -42,12 +43,24 @@ public class FireBaseClient {
         fire=new Firebase(DB_URL);
     }
 
+    public FireBaseClient(Context c, String fireBaseBaseUrl) {
+        this.c = c;
+        this.DB_URL = fireBaseBaseUrl;
+
+        //Initialize
+        Firebase.setAndroidContext(c);
+        //Instantiate
+        fire=new Firebase(DB_URL);
+
+    }
+
     //Save
-    public void saveOnline(String name, String url, int status) {
+    public void saveOnline(String name, String url, String desc, int status) {
         Movie m = new Movie();
         m.setName(name);
         m.setUrl(url);
         m.setStatus(status);
+        m.setDesc(desc);
 
         fire.child("AllIncoming").push().setValue(m);
     }
@@ -92,7 +105,7 @@ public class FireBaseClient {
         movies.clear();
         for(DataSnapshot ds :dataSnapshot.getChildren()) {
             int status = ds.getValue(Movie.class).getStatus();
-            if (status == Constants.publishApproved) {
+            if (status <= Constants.publishReviewPending) {
                 String name= ds.getValue(Movie.class).getName();
                 String url= ds.getValue(Movie.class).getUrl();
                 Log.i(TAG, name + " " + url + " " + Integer.toString(status));

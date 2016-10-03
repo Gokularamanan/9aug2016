@@ -8,6 +8,7 @@ public class Movie {
     private String name;
     private String url;
     private int status;
+    private String desc;
 
     public String getName() {
         return name;
@@ -31,6 +32,14 @@ public class Movie {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public String getDesc() {
+        return desc;
+    }
+
+    public void setDesc(String url) {
+        this.desc = desc;
     }
 
     public Movie() {

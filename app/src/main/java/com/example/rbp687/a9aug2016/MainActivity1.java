@@ -41,7 +41,7 @@ public class MainActivity1 extends AppCompatActivity {
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         FloatingActionButton fab = (FloatingActionButton)findViewById(R.id.fab);
-        Log.d(TAG, "onCreate-MainActivity1");
+        Log.d(TAG, "onCreate");
 
         rv=(RecyclerView)findViewById(R.id.mRecycleID);
         rv.setLayoutManager(new LinearLayoutManager(this));
@@ -124,7 +124,7 @@ public class MainActivity1 extends AppCompatActivity {
                     Log.d(TAG, e.toString());
                 }
                 fireBaseClient.saveOnline(nameEditText.getText().toString(),
-                        urlEditText.getText().toString(), status);
+                        urlEditText.getText().toString(), "empty", status);
 
                 nameEditText.setText("");
                 urlEditText.setText("");
